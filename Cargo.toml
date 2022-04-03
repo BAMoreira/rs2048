@@ -8,5 +8,5 @@ edition = "2021"
 [dependencies]
 
 [[bin]]
-name = "2048.rs"
+name = "2048rs"
 path = "src/main.rs"
