@@ -2,6 +2,7 @@ use std::ops::{Deref, DerefMut};
 
 struct Bd {
     board:Vec<Vec<u32>>,
+    score: u32,
 }
 
 impl Deref for Bd {
@@ -20,11 +21,15 @@ impl DerefMut for Bd {
 
 impl Bd {
     fn gen(a:usize) -> Bd {
-        Bd { board: vec![vec![0;a];a], }
+        Bd {
+            board: vec![vec![0;a];a],
+            score: 0,
+        }
     }
 }
 
 fn main() {
     let mut board = Bd::gen(4);
-    board[1][2]=1;
+    board.score = 1;
+
 }
