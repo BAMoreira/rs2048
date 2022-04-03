@@ -1,5 +1,14 @@
 use std::ops::{Deref, DerefMut};
 
+// Struct for valid moves
+// To be used with a Bd method
+struct Vm {
+    left: bool,
+    right: bool,
+    up: bool,
+    down: bool,
+}
+
 // Main board struct type
 // All should be designed around this as methods
 struct Bd {
@@ -21,7 +30,7 @@ impl DerefMut for Bd {
     }
 }
 
-// Methods and associate functions for Bd
+// Methods and associated functions for Bd
 // Pretty much most of the functions will be in here
 impl Bd {
     // Generate a new empty board with variable size
