@@ -25,5 +25,6 @@ impl Bd {
 }
 
 fn main() {
-    let board = Bd::gen(4);
+    let mut board = Bd::gen(4);
+    board[1][2]=1;
 }
