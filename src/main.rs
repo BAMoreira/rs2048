@@ -1,5 +1,12 @@
 use std::ops::{Deref, DerefMut};
 
+enum Dir {
+    Left,
+    Right,
+    Up,
+    Down,
+}
+
 // Struct for valid moves
 // To be used with a Bd method
 struct Vm {
