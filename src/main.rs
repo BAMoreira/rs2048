@@ -70,13 +70,27 @@ impl Bd {
 
         transp // Return transposed
     }
+
+    // Generates the full list of valid moves, calling another method Bd::valid() to do so
+    fn valid_moves(&self, dir:Dir) -> Vm {
+        Vm {
+            left: self.valid(), // Valid is made with left in mind
+            right: self.transp().iter().rev().collect().transp().valid(), // Transpose once to be able to flip the board and then back
+            up: self.transp().valid(), // Transpose the board to use up as left
+            down: self.iter().rev().collect().transp().valid(), // Flip up and down and then transpose to use down as left
+        }
+    }
 }
 
 // Main function, keep it small
 fn main() {
     let mut board = Bd::gen(4); // Main board on game unless future implementations of multi-boards
 
+    board[2][3] = 44;
 
+    let a = &board[1..];
+
+    for r in a.iter() { println!("{r:?}"); }
     loop {};
 
 }
