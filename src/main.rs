@@ -48,11 +48,33 @@ impl Bd {
             score: 0,
         }
     }
+    // Transposes a board
+    // Implemented to enable omnidirectional methods
+    fn transp(&self) -> Bd {
+        // Initialize empty board with previous score
+        let mut transp = Bd {
+            board : vec![Vec::with_capacity(self.len()); self.len()],  // Empty board with predefined sizes
+            score : self.score, // Copy score over
+        };
+
+        // Iteration loop for transposition
+        self.iter() // Split board into rows
+        .for_each( |row|
+            row.iter().zip(0..self.len()) // Split row again into values, adding indexes to each
+            .for_each( |(v, tcol)|
+                transp[tcol].push(*v) // Rush each value in [row][column] to transp[row]
+            )
+        );
+
+        transp // Return transposed
+    }
 }
 
 // Main function, keep it small
 fn main() {
     let mut board = Bd::gen(4); // Main board on game unless future implementations of multi-boards
 
+
+    loop {};
 
 }
