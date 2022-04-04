@@ -75,9 +75,15 @@ impl Bd {
     fn valid_moves(&self, dir:Dir) -> Vm {
         Vm {
             left: self.valid(), // Valid is made with left in mind
-            right: self.transp().iter().rev().collect().transp().valid(), // Transpose once to be able to flip the board and then back
+            right: Bd { // Dig into to flip row by row
+                board: self.iter().map(|row| row.iter().rev().cloned().collect()).collect(),
+                score: self.score,
+            }.valid(),
             up: self.transp().valid(), // Transpose the board to use up as left
-            down: self.iter().rev().collect().transp().valid(), // Flip up and down and then transpose to use down as left
+            down: Bd { // Flip up and down and then transpose to use down as left
+                board: self.iter().cloned().rev().collect(),
+                score: self.score,
+            }.transp().valid(), // Right and down are a bit more annoying because of collect
         }
     }
     // Checks whether a move left is valid
