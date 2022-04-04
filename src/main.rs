@@ -1,5 +1,7 @@
 use std::ops::{Deref, DerefMut};
 
+// Enum to identify directions
+// To be used with a Bd method
 enum Dir {
     Left,
     Right,
