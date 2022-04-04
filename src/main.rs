@@ -80,6 +80,16 @@ impl Bd {
             down: self.iter().rev().collect().transp().valid(), // Flip up and down and then transpose to use down as left
         }
     }
+    // Checks whether a move left is valid
+    // No need for other directions as long as valid_moves flips the board around
+    fn valid(&self) -> bool {
+        self.iter()
+        .find( |row| {
+            row[1..].iter().enumerate().find(|(pos,col)| {
+                *col & row[pos-1] != 0 || (row[pos-1] == 0 && **col != 0)
+            }).is_some()
+        }).is_some()
+    }
 }
 
 // Main function, keep it small
