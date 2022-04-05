@@ -46,7 +46,7 @@ struct Bd {
     score: u32, // score inside board for future ease when implementing move method
 }
 
-// Deref traits for Bd to call it as matrix
+// Deref traits for Bd to call it as matrix and use Vec methods
 impl Deref for Bd {
     type Target = Vec<Vec<u32>>;
 
@@ -91,7 +91,6 @@ impl Bd {
 
         transp // Return transposed
     }
-
     // Generates the full list of valid moves, calling another method Bd::valid() to do so
     fn valid_moves(&self) -> Vm {
         Vm {
@@ -112,11 +111,12 @@ impl Bd {
             Up|Down => self.transp().board.clone().into_iter(), // Because transp() is temporary
         };
         bd.find( |row| { // Iterating find on separated rows
-            // Here a dyn box is used because of mismatched Iterator and Rev types
-            let mut irow:Box<dyn Iterator<Item = &u32>> = match dir {
-                Left|Up => Box::new(row.iter()),
-                Right|Down => Box::new(row.iter().rev()),
+            let mut nrow = row.clone().into_boxed_slice(); // Bind cloned row to a slice
+            match dir {
+                Right|Down => nrow.reverse(), // To be able to flip them around without massive
+                _ => (),                      // Nestled Iter methods
             };
+            let mut irow = nrow.into_iter();  // Then make the row an Iter to iterate
             let mut prev : u32 = *irow.next().unwrap(); // Stores the first block which can't move
             // And then starts from the second onwards
             irow.find(|col| { // Iterating find on each block of each row now
@@ -128,7 +128,7 @@ impl Bd {
                 };
                 prev = **col;   // Set previous block on memory
                 r
-            }).is_some()
+            }).is_some() // The return of the inner find feeds into the outer find
         }).is_some() // The find iterations succeed if at any time there is a movable pattern found
     }
 }
