@@ -18,6 +18,7 @@
 **************************************************************************************************/
 
 use std::ops::{Deref, DerefMut};
+use crate::Dir::*; // For ease of calling directions
 
 // Enum to identify directions
 // To be used with a Bd method
@@ -30,6 +31,7 @@ enum Dir {
 
 // Struct for valid moves
 // To be used with a Bd method
+#[derive(Debug)] // For debug purposes, remove later
 struct Vm {
     left: bool,
     right: bool,
@@ -91,29 +93,43 @@ impl Bd {
     }
 
     // Generates the full list of valid moves, calling another method Bd::valid() to do so
-    fn valid_moves(&self, dir:Dir) -> Vm {
+    fn valid_moves(&self) -> Vm {
         Vm {
-            left: self.valid(), // Valid is made with left in mind
-            right: Bd { // Dig into to flip row by row
-                board: self.iter().map(|row| row.iter().rev().cloned().collect()).collect(),
-                score: self.score,
-            }.valid(),
-            up: self.transp().valid(), // Transpose the board to use up as left
-            down: Bd { // Flip up and down and then transpose to use down as left
-                board: self.iter().cloned().rev().collect(),
-                score: self.score,
-            }.transp().valid(), // Right and down are a bit more annoying because of collect
+            left: self.valid(Left),
+            right: self.valid(Right),
+            up: self.valid(Up),
+            down: self.valid(Down),
         }
     }
-    // Checks whether a move left is valid
-    // No need for other directions as long as valid_moves flips the board around
-    fn valid(&self) -> bool {
-        self.iter()
-        .find( |row| {
-            row[1..].iter().enumerate().find(|(pos,col)| {
-                *col & row[pos-1] != 0 || (row[pos-1] == 0 && **col != 0)
+    // Checks whether a move in given direction is valid
+    // For right, it flips the board horizontally to read in reverse
+    // For up and down, it transposes the board to read as left and right
+    fn valid(&self, dir: Dir) -> bool {
+        // First match decides whether there's a need to transpose the board or not
+        // And then separates the board, transposed or not, into its constituent rows
+        let mut bd = match dir {
+            Left|Right => self.board.clone().into_iter(), // Need to directly call board and clone
+            Up|Down => self.transp().board.clone().into_iter(), // Because transp() is temporary
+        };
+        bd.find( |row| { // Iterating find on separated rows
+            // Here a dyn box is used because of mismatched Iterator and Rev types
+            let mut irow:Box<dyn Iterator<Item = &u32>> = match dir {
+                Left|Up => Box::new(row.iter()),
+                Right|Down => Box::new(row.iter().rev()),
+            };
+            let mut prev : u32 = *irow.next().unwrap(); // Stores the first block which can't move
+            // And then starts from the second onwards
+            irow.find(|col| { // Iterating find on each block of each row now
+                              // Looking for a specific pattern:
+                let r = {
+                    (**col != 0) &&     // Current block must not be empty, and
+                    ((prev == **col) || // The previous block must be either equal to the current,
+                    (prev == 0))        // Or completely empty
+                };
+                prev = **col;   // Set previous block on memory
+                r
             }).is_some()
-        }).is_some()
+        }).is_some() // The find iterations succeed if at any time there is a movable pattern found
     }
 }
 
@@ -121,11 +137,17 @@ impl Bd {
 fn main() {
     let mut board = Bd::gen(4); // Main board on game unless future implementations of multi-boards
 
-    board[2][3] = 44;
+    board[3][3] = 44;
+    board[3][2] = 33;
+    board[3][1] = 11;
+    board[3][0] = 5;
+    // Debug testing for confirmation
+    for r in board.iter() { println!("{r:?}"); }
 
-    let a = &board[1..];
+    let a = board.valid_moves();
 
-    for r in a.iter() { println!("{r:?}"); }
+    println!("{:?}", a);
+
     loop {};
 
 }
