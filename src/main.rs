@@ -111,7 +111,7 @@ impl Bd {
             Up|Down => self.transp().board.clone().into_iter(), // Because transp() is temporary
         };
         bd.find( |row| { // Iterating find on separated rows
-            let mut nrow = row.clone().into_boxed_slice(); // Bind cloned row to a slice
+            let mut nrow = row.clone(); // Bind cloned row
             match dir {
                 Right|Down => nrow.reverse(), // To be able to flip them around without massive
                 _ => (),                      // Nestled Iter methods
