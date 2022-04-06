@@ -116,18 +116,15 @@ impl Bd {
                 Right|Down => nrow.reverse(), // To be able to flip them around without massive
                 _ => (),                      // Nestled Iter methods
             };
-            let mut irow = nrow.into_iter();  // Then make the row an Iter to iterate
-            let mut prev : u32 = *irow.next().unwrap(); // Stores the first block which can't move
-            // And then starts from the second onwards
-            irow.find(|col| { // Iterating find on each block of each row now
-                              // Looking for a specific pattern:
-                let r = {
-                    (**col != 0) &&     // Current block must not be empty, and
-                    ((prev == **col) || // The previous block must be either equal to the current,
-                    (prev == 0))        // Or completely empty
-                };
-                prev = **col;   // Set previous block on memory
-                r
+            let mut irow = nrow.windows(2); // Split the row into sequential and overlapping pairs
+            irow.find(|pair| { // Iterating find on each pair, Looking for a specific pattern:
+                match pair {   // We match the pair here to handle refutability
+                    [prev,cur] =>
+                        (*cur != 0) &&     // Current block must not be empty, and
+                        ((prev == cur) ||  // The previous block must be either equal to the current,
+                        (*prev == 0)),     // Or completely empty
+                    _ => false,
+                }
             }).is_some() // The return of the inner find feeds into the outer find
         }).is_some() // The find iterations succeed if at any time there is a movable pattern found
     }
