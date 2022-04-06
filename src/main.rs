@@ -131,6 +131,9 @@ impl Bd {
             }).is_some() // The return of the inner find feeds into the outer find
         }).is_some() // The find iterations succeed if at any time there is a movable pattern found
     }
+    fn _apply_move(self, _dir: Dir) -> Bd {
+        self
+    }
 }
 
 // Main function, keep it small
