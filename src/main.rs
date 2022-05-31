@@ -17,8 +17,11 @@
 *                                                                                                 *
 **************************************************************************************************/
 
+extern crate ndarray;
+
 use std::ops::{Deref, DerefMut};
 use crate::Dir::*; // For ease of calling directions
+use ndarray::Array2;
 
 // Enum to identify directions
 // To be used with a Bd method
@@ -42,13 +45,13 @@ struct Vm {
 // Main board struct type
 // All should be designed around this as methods
 struct Bd {
-    board:Vec<Vec<u32>>, // nested vectors for a two-dimension array
+    board:Array2<<u32>>, // nested vectors for a two-dimension array
     score: u32, // score inside board for future ease when implementing move method
 }
 
 // Deref traits for Bd to call it as matrix and use Vec methods
 impl Deref for Bd {
-    type Target = Vec<Vec<u32>>;
+    type Target = Array2<u32>>;
 
     fn deref(&self) -> &Self::Target {
         &self.board
